@@ -1,10 +1,11 @@
 <script setup lang="ts">
-// import { ref } from 'vue'
+import { ref } from 'vue'
 import { useMemberStore } from '@/stores'
+// console.log('aaaaaaa', useMemberStore)
 
 const memberStore = useMemberStore()
 
-// const test = ref()
+const test = ref()
 uni.request({
   url: 'https://www.example.com/request', //仅为示例，并非真实接口地址。
   data: {
