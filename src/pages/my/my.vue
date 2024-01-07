@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useMemberStore } from '@/stores'
-import '@/utils/http'
+import { http } from '@/utils/http'
 // console.log('aaaaaaa', useMemberStore)
 
 const memberStore = useMemberStore()
@@ -20,8 +20,8 @@ const test = ref()
 //     // text.value = 'request success'
 //   },
 // })
-const getData = () => {
-  uni.request({
+const getData = async () => {
+  const res = await http<string[]>({
     url: '/home/banner',
     method: 'GET',
     success: (res) => {
@@ -29,6 +29,7 @@ const getData = () => {
       // text.value = 'request success'
     },
   })
+  console.log('res', res.result)
 }
 </script>
 

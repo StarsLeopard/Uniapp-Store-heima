@@ -19,17 +19,37 @@ const httpInterceptor = {
       args.header.Authorization = token
     }
   },
-  success(args: any) {
-    // 请求成功后，修改code值为1
-    args.data.code = 1
-  },
-  fail(err: UniApp.RequestOptions) {
-    console.log('interceptor-fail', err)
-  },
-  complete(res: UniApp.RequestOptions) {
-    console.log('interceptor-complete', res)
-  },
+  // success(args: any) {
+  //   // 请求成功后，修改code值为1
+  //   args.data.code = 1
+  // },
+  // fail(err: UniApp.RequestOptions) {
+  //   console.log('interceptor-fail', err)
+  // },
+  // complete(res: UniApp.RequestOptions) {
+  //   console.log('interceptor-complete', res)
+  // },
 }
 
 uni.addInterceptor('request', httpInterceptor)
 uni.addInterceptor('uploadFile', httpInterceptor)
+
+interface Data<T> {
+  code: string
+  msg: string
+  result: T
+}
+
+export const http = <T>(options: UniApp.RequestOptions) => {
+  return new Promise<Data<T>>((resolve, reject) => {
+    uni.request({
+      ...options,
+      success(res) {
+        resolve(res.data as Data<T>)
+      },
+      fail(err) {
+        reject(err)
+      },
+    })
+  })
+}
