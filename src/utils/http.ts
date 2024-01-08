@@ -19,16 +19,6 @@ const httpInterceptor = {
       args.header.Authorization = token
     }
   },
-  // success(args: any) {
-  //   // 请求成功后，修改code值为1
-  //   args.data.code = 1
-  // },
-  // fail(err: UniApp.RequestOptions) {
-  //   console.log('interceptor-fail', err)
-  // },
-  // complete(res: UniApp.RequestOptions) {
-  //   console.log('interceptor-complete', res)
-  // },
 }
 
 uni.addInterceptor('request', httpInterceptor)
@@ -45,9 +35,29 @@ export const http = <T>(options: UniApp.RequestOptions) => {
     uni.request({
       ...options,
       success(res) {
-        resolve(res.data as Data<T>)
+        if (res.statusCode >= 200 && res.statusCode <= 300) {
+          resolve(res.data as Data<T>)
+        } else if (res.statusCode === 401) {
+          // 401错误  -> 清理用户信息，跳转到登录页
+          const memberStore = useMemberStore()
+          memberStore.clearProfile()
+          uni.navigateTo({
+            url: '/pages/login/login',
+          })
+          reject(res)
+        } else {
+          uni.showToast({
+            icon: 'success',
+            title: (res.data as Data<T>).msg || '请求错误',
+          })
+          reject(res)
+        }
       },
       fail(err) {
+        uni.showToast({
+          icon: 'error',
+          title: '网络错误',
+        })
         reject(err)
       },
     })
