@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import CustomNav from './components/CustomNav.vue'
 import { ref } from 'vue'
-import { getHomeSwiperAPI } from '@/services/home'
+import { getHomeSwiperAPI, getHomeCategoryAPI, getHomeMutliAPI } from '@/services/home'
 import { onLoad } from '@dcloudio/uni-app'
-import type { BannerItem } from '@/types/home'
+import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
+
+import CategoryPanel from './components/CategoryPanel.vue'
+import HotPanel from './components/HotPanel.vue'
 
 const swiperData = ref<BannerItem[]>([])
 const getBanner = async () => {
@@ -12,16 +15,38 @@ const getBanner = async () => {
   console.log('res', res)
 }
 
+const cateData = ref<CategoryItem[]>([])
+const getCategory = async () => {
+  let res = await getHomeCategoryAPI()
+  cateData.value = res.result
+  console.log('res', res)
+}
+
+const mutliData = ref<HotItem[]>([])
+const getMutli = async () => {
+  let res = await getHomeMutliAPI()
+  mutliData.value = res.result
+  console.log('res', res)
+}
+
 onLoad(() => {
   getBanner()
+  getCategory()
+  getMutli()
 })
 </script>
 
 <template>
   <CustomNav />
   <XtxSwiper :banner-list="swiperData" />
+  <CategoryPanel :list="cateData" />
+  <HotPanel :list="mutliData" />
 </template>
 
 <style lang="scss">
-//
+page {
+  background-color: #f7f7f7;
+  height: 100%;
+  overflow: hidden;
+}
 </style>
