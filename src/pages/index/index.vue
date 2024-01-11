@@ -2,9 +2,9 @@
 import CustomNav from './components/CustomNav.vue'
 import { ref } from 'vue'
 import { getHomeSwiperAPI, getHomeCategoryAPI, getHomeMutliAPI } from '@/services/home'
+import type { XtxGuessInstance } from '@/types/component'
 import { onLoad } from '@dcloudio/uni-app'
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
-
 import CategoryPanel from './components/CategoryPanel.vue'
 import HotPanel from './components/HotPanel.vue'
 
@@ -34,19 +34,33 @@ onLoad(() => {
   getCategory()
   getMutli()
 })
+
+const gessRef = ref<XtxGuessInstance>()
+const scrolltolower = () => {
+  console.log('触底事件触发')
+  gessRef.value.getMore()
+}
 </script>
 
 <template>
   <CustomNav />
-  <XtxSwiper :banner-list="swiperData" />
-  <CategoryPanel :list="cateData" />
-  <HotPanel :list="mutliData" />
+  <scroll-view class="scroll" scroll-y @scrolltolower="scrolltolower">
+    <XtxSwiper :banner-list="swiperData" />
+    <CategoryPanel :list="cateData" />
+    <HotPanel :list="mutliData" />
+    <XtxGuess ref="gessRef" />
+  </scroll-view>
 </template>
 
 <style lang="scss">
 page {
   background-color: #f7f7f7;
   height: 100%;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.scroll {
+  flex: 1;
 }
 </style>
