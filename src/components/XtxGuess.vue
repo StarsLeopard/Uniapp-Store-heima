@@ -5,11 +5,28 @@ import type { GuessItem, PageParams } from '@/types/home'
 import type { PageResult } from '@/types/global'
 
 const guessData = ref<GuessItem[]>([])
+
+// 已结束标记
+const finish = ref(false)
 const getGuess = async () => {
+  // 退出分页判断
+  if (finish.value === true) {
+    return uni.showToast({ icon: 'none', title: '没有更多数据~' })
+  }
+
   let res = await getHomeGuessAPI(pageParams)
   guessData.value?.push(...res.result.items)
-  pageParams.page++
-  console.log('guessData', guessData.value)
+
+  // 分页限制
+  if (pageParams.page < res.result.pages) pageParams.page++
+  else finish.value = true
+}
+
+// 重置数据
+const resetData = () => {
+  pageParams.page = 1
+  guessData.value = []
+  finish.value = false
 }
 
 onMounted(() => {
@@ -17,12 +34,14 @@ onMounted(() => {
 })
 
 // 分页参数
+// Required TS 函数，把可选参数变为必选
 const pageParams: Required<PageParams> = {
   page: 1,
   pageSize: 10,
 }
 
 defineExpose({
+  resetData,
   getMore: getGuess,
 })
 </script>
@@ -47,7 +66,7 @@ defineExpose({
       </view>
     </navigator>
   </view>
-  <view class="loading-text"> 正在加载... </view>
+  <view class="loading-text"> {{ finish ? '没有更多数据~' : '正在加载...' }} </view>
 </template>
 
 <style lang="scss">

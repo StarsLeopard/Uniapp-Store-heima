@@ -38,13 +38,33 @@ onLoad(() => {
 const gessRef = ref<XtxGuessInstance>()
 const scrolltolower = () => {
   console.log('触底事件触发')
-  gessRef.value.getMore()
+  gessRef.value?.getMore()
+}
+
+// 下拉刷新状态
+const isTriggered = ref(false)
+// 自定义下拉刷新被触发
+const onRefresherrefresh = async () => {
+  // 开启动画
+  isTriggered.value = true
+  // 重置猜你喜欢组件数据
+  gessRef.value?.resetData() // 加载数据
+  await Promise.all([getBanner(), getCategory(), getMutli(), gessRef.value?.getMore()]) // 关闭动画
+
+  isTriggered.value = false
 }
 </script>
 
 <template>
   <CustomNav />
-  <scroll-view class="scroll" scroll-y @scrolltolower="scrolltolower">
+  <scroll-view
+    class="scroll"
+    scroll-y
+    @scrolltolower="scrolltolower"
+    refresher-enabled
+    @refresherrefresh="onRefresherrefresh"
+    :refresher-triggered="isTriggered"
+  >
     <XtxSwiper :banner-list="swiperData" />
     <CategoryPanel :list="cateData" />
     <HotPanel :list="mutliData" />
